@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TestroleMapper">
+    
+    <resultMap type="Testrole" id="TestroleResult">
+        <result property="rid"    column="rid"    />
+        <result property="rname"    column="rname"    />
+    </resultMap>
+
+    <sql id="selectTestroleVo">
+        select rid, rname from testrole
+    </sql>
+
+    <select id="selectTestroleList" parameterType="Testrole" resultMap="TestroleResult">
+        <include refid="selectTestroleVo"/>
+        <where>  
+            <if test="rname != null  and rname != ''"> and rname like concat('%', #{rname}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectTestroleByRid" parameterType="Long" resultMap="TestroleResult">
+        <include refid="selectTestroleVo"/>
+        where rid = #{rid}
+    </select>
+        
+    <insert id="insertTestrole" parameterType="Testrole">
+        insert into testrole
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rid != null">rid,</if>
+            <if test="rname != null and rname != ''">rname,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rid != null">#{rid},</if>
+            <if test="rname != null and rname != ''">#{rname},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTestrole" parameterType="Testrole">
+        update testrole
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rname != null and rname != ''">rname = #{rname},</if>
+        </trim>
+        where rid = #{rid}
+    </update>
+
+    <delete id="deleteTestroleByRid" parameterType="Long">
+        delete from testrole where rid = #{rid}
+    </delete>
+
+    <delete id="deleteTestroleByRids" parameterType="String">
+        delete from testrole where rid in 
+        <foreach item="rid" collection="array" open="(" separator="," close=")">
+            #{rid}
+        </foreach>
+    </delete>
+
+</mapper>

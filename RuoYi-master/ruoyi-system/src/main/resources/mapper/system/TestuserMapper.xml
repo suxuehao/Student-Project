@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TestuserMapper">
+
+    <resultMap type="Testuser" id="TestuserResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="sex"    column="sex"    />
+        <result property="age"    column="age"    />
+        <result property="role"    column="role"    />
+        <association property="testrole" javaType="Testrole">
+            <result property="rid" column="rid"/>
+            <result property="rname" column="rname"/>
+        </association>
+    </resultMap>
+
+    <sql id="selectTestuserVo">
+        select u.id, u.name, case when u.sex = 0  then '男' else '女' end as sex, u.age, u.role,r.rid ,r.rname  from testuser u ,testrole r
+    </sql>
+    <select id="selectTestuserList" parameterType="Testuser" resultMap="TestuserResult">
+        <include refid="selectTestuserVo"/>
+        <where>
+        u.role=r.rid
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="sex != null "> and sex = #{sex}</if>
+            <if test="age != null "> and age = #{age}</if>
+            <if test="role != null "> and role = #{role}</if>
+        </where>
+    </select>
+
+    <select id="selectTestuserById" parameterType="String" resultMap="TestuserResult">
+        <include refid="selectTestuserVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertTestuser" parameterType="Testuser">
+        insert into testuser
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="sex != null">sex,</if>
+            <if test="age != null">age,</if>
+            <if test="role != null">role,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="age != null">#{age},</if>
+            <if test="role != null">#{role},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTestuser" parameterType="Testuser">
+        update testuser
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="role != null">role = #{role},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTestuserById" parameterType="String">
+        delete from testuser where id = #{id}
+    </delete>
+
+    <delete id="deleteTestuserByIds" parameterType="String">
+        delete from testuser where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
